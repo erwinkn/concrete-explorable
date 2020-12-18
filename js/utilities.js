@@ -56,11 +56,17 @@ function setupInputs() {
       .text(Math.round(clinkerSubst.substRate*100));
     d3.selectAll('input.substRate')
       .attr('value', clinkerSubst.substRate*100)
+      .filter('.section2')
       .on('input', function(e,d) {
           clinkerSubst.substRate = this.value / 100;
           updateS2()
-          updateS3();
       });
+    d3.selectAll('input.substRate')
+      .filter('.section3')
+      .on('input', function(e,d) {
+          clinkerSubst.substRate = this.value / 100;
+          updateS3();
+      })
     d3.selectAll('span.substScope3')
       .text(Math.round(clinkerSubst.substScope3));
     d3.selectAll('input.substScope3')

@@ -7,7 +7,7 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+        <link rel="stylesheet" href="style.css">
         <!-- Place favicon.ico in the root directory -->
 
     </head>
@@ -19,13 +19,44 @@
             your experience.
             </p>
         <![endif]-->
-        <h3>References:</h3>
-        <ul>
-            <li><a href="https://bost.ocks.org/mike/scroll/">How To Scroll</a> by Mike Bostock</li>
-            <li><a href="https://vallandingham.me/scroller.html">So You Want to Build A Scroller</a> by Jim Vallandingham</li>
-            <li><a href="https://towardsdatascience.com/how-i-created-an-interactive-scrolling-visualisation-with-d3-js-and-how-you-can-too-e116372e2c73">How I Created an Interactive, Scrolling Visualisation with D3.js, and how you can too</a></li>
-            <li><a href="https://blog.ncase.me/explorable-explanations/">Explorable Explanations</a> by Nicky Case</li>
-        </ul>
-
+        <header class="single">
+            <h1>Rapport d'INF552: "Explorable Explanation"</h1>
+        </header>
+        <div class="single">
+            <h2>Contexte</h2>
+            <p>Travaillant sur un outil de modélisation dans le cadre de mon stage de fin d'études ainsi que pour les prochains mois à venir, il m'a semblé naturel d'axer mon projet autour de cette thématique là. Dans le cadre de mes calculs de trajectoires de réductions d'émissions dans ce secteur, je me suis régulièrement retrouvé à manipuler des nombres importants de paramètres, faisant que même un enchaînement d'équations simples aboutissait parfois sur un résultat inattendu ou une interaction surprenante.</p>
+            <p>Ainsi, mon idée initiale était de tout simplement incorporer ce projet d'INF552 à cet outil de modélisation sur lequel je travaille et dont je vous avais envoyé le lien. Bien que celui-ci a un besoin cruel de capacités de visualisation à l'heure actuelle, je me suis rendu compte en me penchant sur la question que dans un premier temps, le travail de visualisation devrait rester simple et être affiné au cours du temps en fonction du besoin des utilisateurs.</p>
+            <p>Néanmoins, je souhaitais pouvoir explorer plus loin que cela durant ce projet et j'ai donc décidé de partir sur une direction différente : il se trouve que cela fait plusieurs années je suis très impressionné par le travail et la philosophie de Bret Victor. Pour être franc, son article <a href="http://worrydream.com/ClimateChange/">"What Can A Technologist Do About Climate Change?"</a> a fortement influencé ma décision de développer un outil de modélisation permettant de réfléchir au-delà de ce que de lourds tableaux Excel permettent.</p>
+        </div>
+        <div class="single">
+            <h2>Une explication explorable</h2>
+            <p>Un des concepts introduits par celui-ci est celui des <i><a href="http://worrydream.com/ExplorableExplanations/">Explorable Explanations</a></i> : des articles ou papiers scientifiques utilisant pleinement le potentiel du medium digital afin de permettre à n'importe qui de s'approprier les chiffres et modèles avancés, de les modifier et de recevoir un feedback immédiat de ces interactions.</p>
+            <p>Ayant récemment écrit un article sur le ciment et le béton dans le contexte de la transition climatique (<a href="https://erwinkn.github.io/posts/cement/">version WIP</a>), je me suis dit que c'était l'opportunité de réaliser l'intersection entre celui-ci et mon travail de modélisation, en proposant un article où il serait possible de comprendre de manière interactive le rôle des différentes technologies clés pour réduire les émissions de CO<sub>2</sub> du secteur du ciment et du béton.</p>
+            <p>Concrétement, j'ai réimplémenté dans cet article une version simplifiée des calculs de modélisation employés dans l'outil professionnel sur lequel je travaille. </p>
+        </div>
+        <div class="single">
+            <h2>Choix de design</h2>
+            <p>Au-delà de l'aspect interactif, l'article lui-même prend une forme particulière, puisqu'il rentre dans la catégorie des <a href="https://vallandingham.me/scroller.html">"scrollers"</a> : après l'introduction, la page est séparée en deux, avec d'un côté le texte et de l'autre les visualisations associées.</p>
+            <p>C'est non seulement un format que j'apprécie beaucoup d'un côté esthétique, pour l'avoir encontré dans plusieurs excellentes visualisations (dont <a href="http://www.r2d3.us/visual-intro-to-machine-learning-part-1/">A Visual Introduction to Machine Learning</a>, mentionné au sein de ce cours), mais elle gagne également un intérêt dédoublé dans le cadre d'un article interactif, puisqu'elle permet de maintenir une boucle de feedback étroite entre les contrôles et explications du texte et les visualisations sur le côté.</p>
+            <p>Par ailleurs, les visualisations prennent systématiquement un format très simple: dans le cadre d'un article interactif, il me semble plus pertinent de construire la complexité par couches, afin que le lecteur puisse progressivement assimiler les concepts et interactions. Pour cela, il est préférable que chaque phénomène mis en lumière puisse être immédiatement observé. En particulier, on retrouve une abondance d'histogrammes, souvent stackés ou normalisés, car ce format permet une lecture et comparaison visuelle immédiate des valeurs présentées.</p>
+        </div>
+        <div class="single">
+            <h2>Limitations et perspectives</h2>
+            <p>L'article est actuellement incomplet, pour de nombreuses raisons. Premièrement, le manque de temps a fait que j'ai dû me focaliser sur une démonstration de concept (scroller + article interactif) et que de nombreux détails ont encore besoin d'être rajoutés (vous trouverez des annotations ou titres manquants par endroit).</p>
+            <p>La dernière section, sur les technologies de capture carbone, en souffre particulièrement, puisque les visualisations choisies se sont avérées inadaptées à transmettre l'intention complète. Par exemple, le diagramme circulaire qui s'y trouve a initialement été choisi pour des raisons esthétiques et afin d'amener de la diversité dans les formats de visualisation utilisés : toutefois, il est clair que celui-ci ne transmet pas l'importance de la capture carbone, dont l'impact en pourcentage entre l'avant et l'après est bien plus important que la substitution clinker, mais qui apparaît avec un impact absolu similaire dans ce cas là.</p>
+            <p>Deuxièmement, le contenu devra être étendu par la suite : actuellement sont présentées trois technologies applicables à la production de ciment. Toutefois, comme mentionné en introduction, il est en réalité nécessaire de considérer l'ensemble de la chaîne de valeur amenant au produit fini qu'est le béton. Les capacités de visualisation et d'interaction de ce projet gagnent alors en puissance, pouvant mettre en lumière des interactions enchevêtrées et leurs implications.</p>
+            <p>Enfin, dans sa vision finale, il serait intéressant d'amener les lecteurs sur un tableau de bord rassemblant les différents contrôles ayant été proposés au cours de l'article, afin de permettre à ceux-ci d'expérimenter librement avec le modèle sous-jacent. Cela leur permettrait alors de se retrouver à l'aise avec un modèle qui aurait été difficile à appréhender si celui-ci avait été fourni dans son entiéreté dès le début.</p>
+        </div>
+        <div class="single">
+            <h3>Références utilisées (concept ou techniques):</h3>
+            <ul>
+                <li><a href="http://worrydream.com/ExplorableExplanations/">Explorable Explanations</a> - Bret Victor</li>
+                <li><a href="https://blog.ncase.me/explorable-explanations/">Explorable Explanations</a> - Nicky Case</li>
+                <li><a href="https://explorabl.es/">Explorable Explanations</a> (une collection)</li>
+                <li><a href="https://bost.ocks.org/mike/scroll/">How To Scroll</a> - Mike Bostock</li>
+                <li><a href="https://vallandingham.me/scroller.html">So You Want to Build A Scroller</a> - Jim Vallandingham</li>
+                <li><a href="https://towardsdatascience.com/how-i-created-an-interactive-scrolling-visualisation-with-d3-js-and-how-you-can-too-e116372e2c73">How I Created an Interactive, Scrolling Visualisation with D3.js, and how you can too</a></li>
+            </ul>
+        </div>
     </body>
 </html>
