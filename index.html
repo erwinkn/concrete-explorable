@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Concrete: the path towards net-zero</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="js/d3.v6.min.js"></script>
+    <script src="js/scroll.js"></script>
+    <script src='js/plant.js'></script>
+    <script src="js/vis.js"></script>
+    <script src="js/utilities.js"></script>
+  </head>
+  <body onload="init();">
+      <header class="single">
+          <h1>Concrete: the path towards net-zero</h1>
+      </header>
+      <div class="single" id="prelude">
+          <p>This article is meant as a complement to my <a href="https://erwinkn.github.io/posts/cement/">general introduction to cement and concrete</a>  in the context of climate. I highly recommend starting over there if you are not familiar with the subject, as we will be diving into more technical details in this one.</p>
+          <p>As discussed in our general introduction, concrete represents 7 to 8% of our current global CO<sub>2</sub> emissions and will be one of the hardest industrial sectors to decarbonize. However, to better understand why and get some insight into how we could reach carbon-neutral concrete, it's helpful to dive into the different techniques and technologies involved.</p>
+          <p>Most low-carbon scenarios for the cement & concrete industries can be captured in a few simple hypotheses and equations for each technology. Since we are projecting up to 2050 and beyond, any prediction will be very uncertain, and these equations definitely simplify much of the complicated details of applying these technologies in real life. However, they are sufficient to get a sense of their relative impact and how everything fits together.</p>
+          <p>We will be diving into this topic in the form of an <a href="http://worrydream.com/ExplorableExplanations/">explorable explanation</a>, with a simple model where you can play around with any of the parameters. It uses some of the equations I've implemented while building a modelling tool for pathways towards net-zero at Vicat. I've picked some sensible values to start with, based on my experience and reports in the field. Everything is explicit and I highly encourage you to mess around and see what happens!</p>
+      </div>
+      <div class="single" id="intro">
+          <h2>The general picture</h2>
+          <p>To build up our model, let's start with our goal and some basic premises:</p>
+          <ul>
+              <li>Concrete is our end-product. Our goal is to reduce its embodied emissions as much as possible. We will be measuring them in kgCO<sub>2</sub> / m<sup>3</sup>.</li>
+              <li>We should look at all technologies and actions available across the value chain: quarry → cement plant → concrete plant → construction → recycling.</li>
+              <li>Most of the embodied emissions in concrete come from the production of cement and, more specifically, clinker. As such, most technologies discussed here will focus on reducing emissions from cement. We will be measuring them in kgCO<sub>2</sub> / t of cement.</li>
+              <li>However, there is also a lot to be done elsewhere: focusing on using less cement and less concrete to achieve the same results helps mitigate residual emissions and the cost of carbon capture as we will see.</li>
+          </ul>
+          <p><i>(Disclaimer: WIP, this article focuses on cement technologies only for now.)</i></p>
+          <p>For the cement plant, I used as reference the values obtained by the Getting the Numbers Right project from the Cement Sustainability Initiative, that aggregated data from over 900 installations worldwide in order to define a typical modern cement plant. The exact values can be found in the <a href="#appendix">Appendix</a>. </p>
+          <!--
+          <p><button onclick="toggle('params1')">Cement plant parameters</button></p>
+          <div id="params1"><input type="range" min=10 max=100 value=80></div>
+          -->
+          <p>Before going into the details of each technology and starting to play around, I think it's helpful to get an overall idea of what our model predicts. So here is a chart showcasing the breakdown of CO<sub>2</sub> emissions for a cement plant over time, according to our model.</p>
+          <p>Also, if you change anything below, it will end up reflected here!</p>
+          <p>To give some useful CO<sub>2</sub> accounting terminology: scope 1 emissions are all direct emissions on-site (for example, coming out of the kiln or other machinery), scope 2 emissions are all emissions that were generated to produce the electricity consumed on site and scope 3 emissions encompass basically everything else (the CO<sub>2</sub> emitted to produce anything bought outside, the transport of people and materials to the site, etc...)</p>
+
+          <div id="co2Hist"> <!-- Reserved for d3 --> </div>
+          <p>You can see that most of the current emissions are in the scope 1 category: those are the CO<sub>2</sub> emissions from clinker production, both from the combustion of fuels and the calcination reaction. Since they constitute the majority and will be hard to reduce, most of the focus goes there.</p>
+          <p>Scope 2 emissions are also important, but there are simply less opportunities to reduce the electrical consumption of a modern cement plant and the bet here is that the electricity grid will also get to net-zero by 2050.</p>
+          <p>You may also notice that scope 3 emissions are strangely constant: this is because we are using a simple model, that just assumes a fixed amount of CO<sub>2</sub> emitted per ton of cement for all the transport, raw materials, etc... In practice, it's obviously not the case — nevertheless, scope 3 can become important, depending on some of the hypotheses we adopt below.</p>
+          <p>Last thing before you dive in: here is an overview of the technologies we will be going over. Below is a map that summarizes the main characteristics of each one. It will be helpful to navigate the landscape and you can click on any of the technologies to go directly to their dedicated section.</p>
+          <div id="techMap"> <!-- Reserved for d3 --> </div>
+      </div>
+      <div id="dual">
+        <div id="technologies">
+            <section class="step">
+                <h2>Fuel substitution</h2>
+                <p>One major ongoing effort in the cement industry is the switch from fossil fuels to "alternative" fuels. These encompass all sorts of waste that can be used to generate heat, instead of being incinerated or put in a landfill elsewhere. (Think of shredded tires, paper waste, etc...)</p>
+                <p>Despite the technical challenges involved, some European plants have already reached over 80% alternative fuels and many are aiming to reach 0% fossil fuels by 2025 or 2030.</p>
+                <p>Generally, a difference is made between biomass and non-biomass waste. From here on, I will use "biomass" to refer to the former and simply "alternative fuels" for the latter.</p>
+                <p>This distinction is important because, depending on the carbon accounting method, we may or may not take into account the CO<sub>2</sub> emissions from biomass. Since any CO<sub>2</sub> that comes out of biomass has first been captured from the atmosphere while it was growing, I tend to not count biomass emissions — but you have the option of choosing the accounting method below. <b>[WIP]</b></p>
+                <p>Alright, here are the parameters. The idea is simple: you set the final percentage of alternative fuels and biomass in the fuel mix.</p>
+                <div id="fuelSubst" class="params">
+                    <span class="params-col1">
+                        <p>Alternative fuels: <span class="altFinal"></span>%</p>
+                        <input type="range" min="0" max="50" class="altFinal">
+                    </span>
+                    <span class="params-col2">
+                        <p>Biomass: <span class='biomassFinal'></span>%</p>
+                        <input type="range" min="0" max="50" class="biomassFinal">
+                    </span>
+                </div>
+                <p>You may notice a few things. First, the CO<sub>2</sub> impact is not that high, even if you max out on biomass (which is limited to 50%, but in practice it'd be hard to find enough organic waste to go beyond that). That is a consequence of the <a href="https://erwinkn.github.io/posts/cement/#co2problem">CO<sub>2</sub> problem of cement</a>: most of the emissions come from the calcination reaction that happens in the clinker kiln.</p>
+                <p>Second, if you increase the percentage of alternative fuels, you'll see the emissions actually increase! That is because alternative fuels generally have a worse emissions factor: they emit more CO<sub>2</sub> than fossil fuels to produce a given amount of energy. You can find the exact values used in the model in the <a href="#appendix">appendix</a>.</p>
+                <p>One other thing, which is not taken into account here: increasing the percentage of alternative fuels generally leads to a higher thermal energy demand, as they do not burn as well as fossil fuels.</p>
+                <p>Despite all this, the switch to alternative fuels can have a positive climate impact, provided enough biomass makes it into the mix, and yields important benefits outside of the CO<sub>2</sub> aspect: it encourages a local circular economy and helps dispose of waste that would have required dedicated facilities otherwise.</p>
+            </section>
+            <hr>
+            <section class="step">
+                <h2>Clinker substitution</h2>
+                <p>Clinker is not only the major component of cement, but also what provides it with binding power. The clinker ratio, defined as the % of clinker in the final cement blend, is a strong indicator of mechanical strength and durability of the resulting cement, in the absence of other substitution materials.</p>
+                <p>However, around 80 to 90% of the CO<sub>2</sub> emissions of the cement and concrete sector come from the production of clinker. Thus, a crucial step for the sector towards reducing its emissions in the short to medium term is trying to find other materials that can fulfill the same role of hardening upon hydration.</p>
+                <p>Currently, the main candidates are:</p>
+                <ul>
+                    <li>Fly ash, a byproduct of coal combustion</li>
+                    <li>Blast furnace slag (also known as BFS), a byproduct of steel production</li>
+                    <li>Clays, either unaltered or calcined to increase their reactive power</li>
+                    <li>Other pozzolanic materials, such as natural volcanic rocks, vegetable ashes or byproducts of silicon production. All of these are in scarce supply.</li>
+                </ul>
+                <p>Fly ash and BFS are the most commonly used clinker alternatives today and can be included even up to 50% or 70% of the final cement mix. The problem is that they are byproducts of CO<sub>2</sub> intensive industries. While they have no associated scope 3 emissions today, it is likely that they will acquire a significant weight in the CO<sub>2</sub> accounting balance in the future.</p>
+                <p>We will consider two parameters for clinker substitution: the % of the substitution material in the final cement mix and the associated scope 3 emissions per ton of material. To give an example, steel manufacturing produces between 1.8 and 3 tons of CO<sub>2</sub> per ton of steel: scope 3 emissions of even 300 or 400 kgCO<sub>2</sub> per ton of BFS would still be reasonable.</p>
+
+                <div class="params">
+                    <span class="params-col1">
+                        <p>Clinker substitute:<br>
+                          <span class="substRate"></span>% of final mix</p>
+                        <input type="range" min="0" max="75" class="substRate">
+                    </span>
+                    <span class="params-col2">
+                        <p>Scope 3 emissions:<br>
+                          <span class='substScope3'></span>kgCO<sub>2</sub> / t-substitute</p>
+                        <input type="range" min="0" max="1000" class="substScope3">
+                    </span>
+                </div>
+                <p>This time we see quite a sharp drop in CO<sub>2</sub>! Since most emissions come from clinker production, replacing a large part of it with another material naturally leads to strong reductions.</p>
+                <p>Note that the slider above allows you to substitute literally all the clinker in cement: in practice, it would likely lead to serious concerns with regards to the mechanical strength of the resulting cement and concrete and is unlikely to happen.</p>
+                <p>There is one thing I'd like to draw your attention to: as you increase scope 3 emissions associated with the material, you should quickly reach a point where, even though clinker substitution reduces emissions in the short-term, it actually leads to greater levels of CO<sub>2</sub> emissions in the long-term!</p>
+                <p>How is that possible? Well, our model also includes the installation of carbon capture past 2040 (see <a href="#carboncapture">the section below</a>). Assuming all goes well, that means clinker becomes relatively low-carbon, so any material that is carbon-intensive to produce becomes a worse alternative.</p>
+                <p>On the other hand, carbon capture is very expensive: if we can use less clinker in cement (and less cement in concrete), we can mitigate the cost impact of this technology on the end products. There could very well be a tradeoff in that regard in the long-term!</p>
+                <p>One other thing that is not taken into account in this model but is nonetheless important: the substitution materials may require energy, both thermal and electric, before they can be used instead of clinker.</p>
+                <p>In the case of fly ash and BFS, it's a minor amount of electricity to grind them properly (but they have that inconvenient of likely carrying high scope 3 emissions in the future). In the case of calcined clays, the thermal demand can reach nearly 40 or 50% that of clinker.</p>
+                <p>As you can see, the choice of a clinker alternative is far from easy (and likely the subject of many heated conversations at the bar), despite being one of our strongest avenues to reduce cement emissions before we are able to deploy carbon capture.</p>
+                <p>One last thing: not all materials are available in the same quantities and another major concern regarding fly ash and BFS is that their supply will almost certainly diminish in the future, as coal plants are replaced and the steel industry moves towards their own net-zero goals.</p>
+                <p>Here is a chart that compares the current supply of different substitutes:</p>
+                <figure>
+                    <img src="imgs/scrivener18_clinker-substitution.jpg" width="100%"
+                         alt="Current use and estimated supply of clinker substitutes and fillers"/>
+                    <figcaption>
+                        <h4>Current use and estimated supply of clinker substitutes and fillers (<a href="https://www.sciencedirect.com/science/article/pii/S0008884618301480">source</a>)</h4>
+                    </figcaption>
+                </figure>
+
+            </section>
+            <hr>
+            <section class="step" id="carboncapture">
+                <h2>Carbon capture technologies</h2>
+                <p>We are now ready to talk about what may be the most critical technology for the cement & concrete industry to reach net-zero emissions: carbon capture.</p>
+                <p>By now, you probably know that due to the <a href="https://erwinkn.github.io/posts/cement/#co2problem">CO<sub>2</sub> problem of clinker</a>, it is impossible to completely reduce the emissions associated with its production without completely replacing it or moving to another process (which seems <a href="https://erwinkn.github.io/posts/cement/#novel-cements">very unlikely</a> today).</p>
+                <p>As such, carbon capture is the only way out to actually achieve carbon-neutral cement and concrete.</p>
+                <p>The idea is simple: cement plants are large installations with a high concentration of CO<sub>2</sub> in their flue gases, so you can just install additional machinery at the end to put the gases into contact with some reactant that will fix the CO<sub>2</sub> contained in them and let the rest escape normally.</p>
+                <p>There are in fact multiple carbon capture technologies, which mainly differ in their energy costs, their financial costs, their technological maturity (although none are used at production-scale today) and how they integrate with the regular production line.</p>
+                <p>To simplify things here, I am going to give you presets for 3 of the most common or most promising technologies in that area. What we are interested in here is how carbon capture interacts with other parameters, such as the clinker substitution rate and the amount of cement used in concrete.</p>
+                <p>The technologies are the following:</p>
+                <ul>
+                <li>Oxyfuel combustion: by injecting pure oxygen instead of regular air into the clinker kiln, it becomes possible to reach CO<sub>2</sub> concentrations of around 80% in the flue gases. Separation and capture then become much easier. It is often considered the most promising technique for the cement industry, since it is the cheapest one and would allow for better combustion in the kiln. Its major drawback is that it will require major changes in the clinker production line and additional technical knowledge to operate correctly.</li>
+                <li>Amine-based carbon capture: instead of letting the flue gases escape in the atmosphere, they are put into contact with an amine solution, that fixes the CO<sub>2</sub> they contain. The process can be added directly at the end of the production line without changing anything else. It is also more technologically mature than oxyfuel, but current estimations suggest it would have higher energy demand and financial costs.</li>
+                </ul>
+                <p>Here are the controls:</p>
+                <ul>
+                    <li>Activate carbon capture: <input type="checkbox" id="activateCC" /></li>
+                    <li>Chosen technology: <br>
+                        <input type="radio" id="oxyfuel" name="cc" value="oxyfuel" checked>
+                        <label for="oxyfuel">Oxyfuel combustion</label>
+                        <br>
+                        <input type="radio" id="amine" name="cc" value="amine">
+                        <label for="amine">Amine-based carbon capture</label>
+                    </li>
+                </ul>
+                <p>The first thing that appears is how significant carbon capture is: despite being the last technology applied in this model (since it will likely be applicable in production only past 2040), it has one of the strongest absolute impacts.</p>
+                <p>However, as mentioned before, carbon capture also leads to an explosion in the price of clinker. One interesting consequence of this is that other technologies can help mitigate this problem. Here you can see a comparison between the percentage increase in price of cement with and without the use of clinker substitution.</p>
+                <p>Here is a control for the clinker substitution rate, so you can see for yourself how this relationship behaves:</p>
+                <p>Clinker substitution rate:<br>
+                    <span class="substRate"></span>% of the final mix <br>
+                    <input type="range" min="0" max="75" class="substRate">
+                </p>
+            </section>
+        </div>
+        <div id="vis">
+        </div>
+      </div>
+      <div class="single" id="appendix">
+
+      </div>
+  </body>
+</html>
