@@ -28,7 +28,7 @@ function setupVis() {
 
 // setup and update the introduction visualisation
 function intro() {
-  let hmargin = 25;
+  let hmargin = 30;
   let vmargin = 25;
   let vboxW = 600;
   let vboxH = 400;
@@ -244,6 +244,13 @@ function section1() {
             `translate(${hpadding}, ${ctx.h / 2})`)
        .call(d3.axisLeft(yScale))
        .classed('s1', true);
+    // y axis unit
+    svg.append('text')
+       .classed('s1', true)
+       .attr('x', hpadding - 45)
+       .attr('y', ctx.h / 2 + vpadding / 2 - 5)
+       .attr('font-size', 8)
+       .text('kgCO2 / t-cem');
   }
   // --- Update ---
   svg.selectAll('g.fuelSubstCo2')
@@ -393,8 +400,15 @@ function section2() {
        .classed('yAxis', true)
        .attr('transform',
             `translate(${hpadding}, ${ctx.h / 2})`)
-       .call(d3.axisLeft(yScale))
+       .call(d3.axisLeft(yScale).ticks(9))
        .classed('s2', true);
+    // y axis unit
+    svg.append('text')
+       .classed('s2', true)
+       .attr('x', hpadding - 45)
+       .attr('y', (ctx.h + vpadding) / 2 - 5)
+       .attr('font-size', 8)
+       .text('kgCO2 / t-cem');
   }
   // --- Update ---
   svg.selectAll('g.clinkerSubstCo2')
@@ -525,7 +539,7 @@ function section3() {
        .classed('yAxis', true)
        .attr('transform',
              `translate(${hpadding}, ${ctx.h / 2})`)
-       .call(d3.axisLeft(yScale).ticks(11, '+%'))
+       .call(d3.axisLeft(yScale).ticks(9, '+%'))
        .classed('s3', true);
     svg.append('g')
        .classed('opexCC', true)
