@@ -4,4 +4,4 @@ A technical complement to my article _[There's no plan B for concrete](https://e
 
 It takes the form of an **explorable explanation** built into a **scroller article**, where text and visualisations live side by side.
 
-This is still very much WIP and was written very hastily using D3.js, please do not consider this to be good code nor a complete article. Further work is needed before a polished version lands on my blog.
+This is still very much WIP and was written very hastily using [D3.js](https://d3js.org/), please do not consider this to be good code nor a complete article. Further work is needed before a polished version lands on my blog.
